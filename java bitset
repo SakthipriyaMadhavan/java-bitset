@@ -1,0 +1,59 @@
+import java.io.*;
+import java.util.*;
+import java.util.regex.*;
+
+public class Solution {
+    public static Pattern pattern = Pattern.compile("(?<operation>AND|OR|XOR|FLIP|SET) (?<arg1>[0-9]+) (?<arg2>[0-9]+)");
+    
+    public static void main(String[] args) {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
+        Scanner s = new Scanner(System.in);
+        int n = s.nextInt();
+        int m = s.nextInt();
+        s.nextLine();
+        BitSet[] bitSets = {new BitSet(n), new BitSet(n)};
+        
+        for(int i = 0; i < m; i++) {
+            String line = s.nextLine();
+            doOperation(line, bitSets);
+        }
+        
+        s.close();
+    }
+    
+    private static void doOperation(String line, BitSet[] bitSets) {
+        Matcher matcher = pattern.matcher(line);
+        if(!matcher.find()) throw new RuntimeException("Invalid Input. No matches found.");
+        
+        String operation = matcher.group("operation");
+        int arg1 = Integer.valueOf(matcher.group("arg1")) - 1; // For 0-based indexing
+        int arg2 = Integer.valueOf(matcher.group("arg2"));
+        
+        switch (operation) {
+        case "AND":
+            bitSets[arg1].and(bitSets[arg2 - 1]);
+            break;
+        case "OR":
+            bitSets[arg1].or(bitSets[arg2 - 1]);
+            break;
+        case "XOR":
+            bitSets[arg1].xor(bitSets[arg2 - 1]);
+            break;
+        case "FLIP":
+            bitSets[arg1].flip(arg2);
+            break;
+        case "SET":
+            bitSets[arg1].set(arg2);
+            break;
+        default:
+            throw new RuntimeException("Unsupported operation: " + operation);
+    }       
+        
+        //  System.out.printf("OPERATION: %s\nARG1: %d\nARG2: %d\n"
+        // + "SET1(Before / After): %s --- %s\n"
+        // + "SET2(Before / After): %s --- %s\n"
+        // , operation, arg1, arg2, buffer1.toString(), bitSets[0].toString(), buffer2.toString(), bitSets[1].toString());
+        
+        System.out.println(bitSets[0].cardinality() + " " + bitSets[1].cardinality());
+    }
+}
